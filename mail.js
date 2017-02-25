@@ -16,6 +16,9 @@ var countries = ['japan', 'korea', 'tailand'];
 http.maxRedirects = 3;
 var connected = 0;
 
+var confpath= 'D:\\Program Files\\OpenVPN\\config';
+var logpath = 'D:\\Program Files\\OpenVPN\\log';
+
 var createImap = function(file){
 	ini = require('ini');
 	var config = ini.parse(fs.readFileSync(file).toString());
@@ -30,16 +33,28 @@ var createImap = function(file){
 	});
 }
 
-var remove_unconnected= function(logpath) {
+var removeUnconnected= function(logpath, confpath) {
 	fs.readdir(logpath, function(err, files){
 	      if(err){
 		    return;
 	      }
-              files.forEach(function(i, arr){
+	      
+              files.forEach(function(elt, i, arr){
 	          fs.readFile(path.join(logpath, arr[i]), function(err, data){
 		      if(err) return;
-
-		  });
+		      data = data.toString().toLowerCase();
+		      if(data.indexOf('initialization sequence completed')<0 && path.extname(arr[i]).indexOf('.log')>=0){
+			     // console.log(path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '')+'.ovpn'));
+			     var vfile = path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '')+'.ovpn');
+			     fs.exists(vfile, function(exists){
+				   if(exists){
+					console.log(vfile);
+				   	fs.unlink(vfile);
+				   }
+			     });
+			     
+		      }
+		      });
 	      });
 	});
 }
@@ -137,7 +152,7 @@ function connect(url) {
                 var ip = cells.eq(1).find('span').first().text();
                 var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
                 console.log(downparam[0]);
-                download(downparam[0], false, 'D:\\Program Files\\OpenVPN\\config\\' + downparam[1]);
+                download(downparam[0], false, path.join(confpath, downparam[1]) );
             })
 
         });
@@ -230,11 +245,12 @@ imap.once('ready', function() {
 });
 
 
+
 imap.once('error', function(err) {
     console.error(err);
 });
 
-
+removeUnconnected(logpath, confpath);
 imap.connect();
 
 
