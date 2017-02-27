@@ -15,13 +15,16 @@ console.log(ghdate);;
 var countries = ['japan', 'korea', 'tailand'];
 http.maxRedirects = 3;
 var connected = 0;
+var config = ini.parse(fs.readFileSync(file).toString());
 
-var confpath= 'D:\\Program Files\\OpenVPN\\config';
-var logpath = 'D:\\Program Files\\OpenVPN\\log';
+var confpath= config.openvpn.confpath;
+var logpath = config.openvpn.logpath;
+var bindip = config.openvpn.bindip;
+var addlog=config.openvpn.addlog;
 
 var createImap = function(file){
 	ini = require('ini');
-	var config = ini.parse(fs.readFileSync(file).toString());
+
 	var mailsettings = config.mailbox;
 
 	return new Imap({
@@ -44,7 +47,6 @@ var removeUnconnected= function(logpath, confpath) {
 		      if(err) return;
 		      data = data.toString().toLowerCase();
 		      if(data.indexOf('initialization sequence completed')<0 && path.extname(arr[i]).indexOf('.log')>=0){
-			     // console.log(path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '')+'.ovpn'));
 			     var vfile = path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '')+'.ovpn');
 			     fs.exists(vfile, function(exists){
 				   if(exists){
@@ -62,7 +64,7 @@ var removeUnconnected= function(logpath, confpath) {
 var imap = createImap('./config.ini');
 
 
-var download = function(url, nobind, fpath) {
+var download = function(url, fpath) {
     var req = http.get(url, function(res) {
         var data = "";
         res.on('data', function(chunk) {
@@ -70,9 +72,12 @@ var download = function(url, nobind, fpath) {
         })
 
         res.on('end', function() {
-            if (nobind) {
-                data = data.replace(/\(Quality\)<\/td>/g, '(Quality)');
+            if (bindip) {
+                data = data.replace(/nobind/g, 'bind '+bindip);
             }
+	    if (addlog){
+	        data = data + 'log' + logpath + '\n';
+	    }
             fs.writeFileSync(fpath, data);
         });
     });
@@ -152,7 +157,7 @@ function connect(url) {
                 var ip = cells.eq(1).find('span').first().text();
                 var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
                 console.log(downparam[0]);
-                download(downparam[0], false, path.join(confpath, downparam[1]) );
+                download(downparam[0],  path.join(confpath, downparam[1]) );
             })
 
         });
