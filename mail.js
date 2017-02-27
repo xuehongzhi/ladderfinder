@@ -6,6 +6,7 @@ var _ = require('underscore');
 var http = require('follow-redirects').http;
 var urlfunc = require('url');
 
+var ini = require('ini');
 
 var cheerio = require('cheerio');
 var curdate = Date.now();
@@ -15,15 +16,14 @@ console.log(ghdate);;
 var countries = ['japan', 'korea', 'tailand'];
 http.maxRedirects = 3;
 var connected = 0;
-var config = ini.parse(fs.readFileSync(file).toString());
+var config = ini.parse(fs.readFileSync('./config.ini').toString());
 
 var confpath= config.openvpn.confpath;
 var logpath = config.openvpn.logpath;
 var bindip = config.openvpn.bindip;
 var addlog=config.openvpn.addlog;
 
-var createImap = function(file){
-	ini = require('ini');
+var createImap = function(){
 
 	var mailsettings = config.mailbox;
 
@@ -61,7 +61,7 @@ var removeUnconnected= function(logpath, confpath) {
 	});
 }
 
-var imap = createImap('./config.ini');
+var imap = createImap();
 
 
 var download = function(url, fpath) {
