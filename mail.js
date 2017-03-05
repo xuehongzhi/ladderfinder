@@ -71,12 +71,13 @@ var download = function(url, fpath) {
             data += chunk.toString('utf8');
         })
 
+
         res.on('end', function() {
             if (bindip) {
                 data = data.replace(/nobind/g, 'bind '+bindip);
             }
 	    if (addlog){
-	        data = data + 'log' + logpath + '\n';
+	        data = data + 'log ' +path.join(logpath, path.basename(fpath).replace('.ovpn', '.log'))  + '\n';
 	    }
             fs.writeFileSync(fpath, data);
         });
