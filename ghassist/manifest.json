@@ -1,0 +1,44 @@
+{
+    "name": "挂号助手",
+    "description": "挂号助手",
+    "default_locale": "zh_CN",
+    "options_page": "views/options.html",
+    "version": "1.2.3",
+    "content_scripts": [{
+        "run_at": "document_end",
+        "matches": ["http://www.bjguahao.gov.cn/dpt/appoint/*"],
+        "js": ["javascript/underscore-min.js", "javascript/jquery.min.js", "javascript/content.js"]
+    },{
+        "run_at": "document_idle",
+        "matches": ["http://www.bjguahao.gov.cn/order/confirm/*"],
+        "js": ["javascript/underscore-min.js", "javascript/jquery.min.js", "javascript/content1.js"]
+    },{
+        "run_at": "document_idle",
+        "matches": ["https://app.mysms.com/*"],
+        "js": ["javascript/underscore-min.js", "javascript/jquery.min.js", "javascript/mysms.js"]
+    }
+    
+    ],
+    "background": {
+        "page": "views/background.html"
+    },
+    "icons": {
+        "48": "images/icon-48.png",
+        "16": "images/icon-16.png"
+    },
+    "permissions": [
+        "tabs",
+        "storage",
+        "http://www.bjguahao.gov.cn/dpt/appoint/*",
+	"https://app.mysms.com/*",
+	"http://www.bjguahao.gov.cn/order/confirm/*"
+    ],
+    "browser_action": {
+        "default_title": "__MSG_title__",
+        "default_icon": { // optional
+            "19": "images/icon-16.png" // optional
+        }
+    },
+
+    "manifest_version": 2
+}

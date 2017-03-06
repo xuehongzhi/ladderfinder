@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" charset="utf-8" content="text/html;" />
+    <script src="../javascript/jquery.min.js"></script>
+    <script src="../javascript/jquery.tagsinput.min.js"></script>
+    <script src="../javascript/options.js"></script>
+    <link href='../css/jquery.tagsinput.min.css' rel="stylesheet">
+    <title id="optionsTitle">挂号设置</title>
+</head>
+<style>
+tr input {
+  width:300px;
+}
+div.tagsinput {
+  padding:1px;
+}
+</style>
+<body>
+    <table cellpadding="1">
+        <tbody>
+            <tr>
+                <td style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">手机号:</span>
+                </td>
+                <td  style="word-break: break-all;">
+                    <input type="text" id="cellphone" name="email" value="">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    &nbsp;<span style="color: rgb(0, 176, 80);">密码:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    <input type="password" id="password" name="hours" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医师:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="doctor" name="doctor" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医师职称:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="doctitle" name="doctitle" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    &nbsp;<span style="color: rgb(0, 176, 80);">挂号人</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    <input type="text" id="patient" name="patient" value="" />
+                </td>
+            </tr>
+	    <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医保卡</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    <input type="text" id="cardno" name="cardno" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    &nbsp;<span style="color: rgb(0, 176, 80);">关键字:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;" >
+                    <input type="text" id="keywords" name="keywords" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" rowspan="1" align="right">
+                    <button id="save" name='save' i18n-content="extensionSettingsLoadUnpackedButton">保存 &nbsp;&nbsp;</button>
+                    <button id="cancel" i18n-content="extensionSettingsLoadUnpackedButton">取消 &nbsp;&nbsp;</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
