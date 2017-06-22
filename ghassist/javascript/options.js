@@ -14,7 +14,9 @@ function save_options() {
     var phone = $('#cellphone').val();
     var pass = $('#password').val();
     var keywords = $('#keywords').val();
-    console.log(keywords);
+    var weekdays =  _.reduce($('#weekday input[type="checkbox"]:checked'), function(memo, e) {return memo.concat(parseInt($(e).val()))}, []);
+   
+    console.log(weekdays);
     chrome.storage.sync.set({
         phonenumber: phone,
         password: pass,
@@ -23,6 +25,7 @@ function save_options() {
 	doctitle:$('#doctitle').val(),
 	patient:$('#patient').val(),
 	cardno:$('#cardno').val(),
+	weekdays: weekdays.join(','),
     }, function() {
 
     });
@@ -58,6 +61,16 @@ $(function() {
     restore_options();
     $('#save').click(function(e) {
         save_options();
+    });
+    $('#dayall').click(function(){
+	    var txt = $(this).val();
+	    var checked = !(txt=="反选");
+	    $('#weekday input[type="checkbox"]').prop('checked', checked);
+	    if(!checked) {
+	        $(this).val('全选');
+	    } else {
+		$(this).val('反选');
+	    }
     });
 
 });

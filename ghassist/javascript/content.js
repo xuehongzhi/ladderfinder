@@ -4,7 +4,13 @@
      keywords: '',
      doctor: '',
      doctitle: '',
+     ghenable: false
  }, function(items) {
+     chrome.extension.sendMessage({
+                             action: 'refreshicon',
+                           enable:items.ghenable 
+                         });
+
      var curdate = Date.now();
      var ghdate = new Date(curdate.valueOf() + 7 * 24 * 3600 * 1000);
      ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.getDate();
@@ -15,14 +21,20 @@
      var hpid = parseInt(rpath[0]);
      var depid = parseInt(rpath[1]);
      var keyword = [];
-     if(!$.isEmptyObject(items.keywords)){
-	   keyword  = items.keywords.split(',');
+     if (!$.isEmptyObject(items.keywords)) {
+         keyword = items.keywords.split(',');
      }
      var title = [];
-     if(!$.isEmptyObject(items.doctitle)){
-	   title  = items.doctitle.split(',');
+     if (!$.isEmptyObject(items.doctitle)) {
+         title = items.doctitle.split(',');
      }
 
+     chrome.runtime.onMessage.addListener(function(message, sender, response) {
+         items.ghenable = !!message.enable;
+         response({
+             enable: "ok"
+         });
+     });
 
 
      var fakeips = ['122.122.122.1', '122.122.121.1']
@@ -38,7 +50,7 @@
      var ghspan = 500;
 
      var find = false;
-    
+
      var matched = function() {
          curdate = new Date(Date.now());
          var d1 = new Date(curdate.getFullYear(), curdate.getMonth(), curdate.getDate(), chcktime[0], chcktime[1]);
@@ -51,16 +63,16 @@
              find = false;
          }
          return find;
-	  
+
      }
 
      var simulateLogin = function() {
          var f = $('#rg_nrfrom1')[0];
          f.smsQuick.value = items.phonenumber;
          $('#pwQuickLogin').val(items.password);
-          $('#rg_nrfrom1 #quick_login').trigger('click');
+         $('#rg_nrfrom1 #quick_login').trigger('click');
      }
-     
+
      var doCheckin = function(timelist, ip) {
          if (timelist.length == 0) {
              timerid = setTimeout(doaction, ghspan);
@@ -104,17 +116,17 @@
                          var i = e.skill ? _.findIndex(keyword, function(k) {
                              return e.skill.indexOf(k) >= 0
                          }) : -1;
-			 if($.isEmptyObject(keyword)){
-			    i = 0;
-			 }
+                         if ($.isEmptyObject(keyword)) {
+                             i = 0;
+                         }
                          return e.remainAvailableNumber != 0 && e.totalFee <= 300 && i >= 0;
                      }), function(e) {
                          return e.doctorTitleName;
                      });
                      var key = _.find(_.keys(a), function(k) {
-			 if($.isEmptyObject(title)){
-				return true;
-			 }
+                         if ($.isEmptyObject(title)) {
+                             return true;
+                         }
                          return _.findIndex(title, function(t) {
                              return k.indexOf(t) >= 0;
                          }) >= 0;
@@ -138,6 +150,9 @@
 
 
      function doaction() {
+         if (!items.ghenable) {
+             return;
+         }
          if (matched()) {
              console.log('开启定时挂号模式');
              doCheckin([{
