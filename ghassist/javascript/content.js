@@ -5,6 +5,7 @@
      doctor: '',
      doctitle: '',
      ghenable: false,
+     ghinterval: 7,
      dayperiod:0
  }, function(items) {
      chrome.extension.sendMessage({
@@ -13,7 +14,7 @@
                          });
 
      var curdate = Date.now();
-     var ghdate = new Date(curdate.valueOf() + 7 * 24 * 3600 * 1000);
+     var ghdate = new Date(curdate.valueOf() + items.ghinterval * 24 * 3600 * 1000);
      ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.getDate();
      //ghdate = '2016-09-22';
      console.log(ghdate);

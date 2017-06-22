@@ -26,6 +26,7 @@ function save_options() {
 	doctitle:$('#doctitle').val(),
 	patient:$('#patient').val(),
 	cardno:$('#cardno').val(),
+	ghinterval:$('#ghinterval').val(),
 	weekdays: weekdays.join(','),
 	dayperiod:parseInt(dayperiod)
     }, function() {
@@ -45,6 +46,7 @@ function restore_options() {
         doctitle:'',
         patient:'',
         cardno:'',
+        ghinterval:7,
         dayperiod:0,
     }, function(items) {
         $('#cellphone').val(items.phonenumber);
@@ -54,6 +56,7 @@ function restore_options() {
         $('#keywords').importTags(items.keywords);
         $('#doctitle').importTags(items.doctitle);
         $('#cardno').val(items.cardno);
+        $('#ghinterval').val(items.ghinterval);
         $('#dayperiod').val(items.dayperiod);
     });
 }
