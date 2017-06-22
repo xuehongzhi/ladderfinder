@@ -181,7 +181,7 @@
 
      timerid = setTimeout(doaction, ghspan);
      setInterval(function() {
-         if (!find) {
+         if (items.ghenable && !find) {
              clearTimeout(timerid);
              chrome.extension.sendMessage({
                  action: 'reload'
