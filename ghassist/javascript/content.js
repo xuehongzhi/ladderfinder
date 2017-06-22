@@ -4,7 +4,8 @@
      keywords: '',
      doctor: '',
      doctitle: '',
-     ghenable: false
+     ghenable: false,
+     dayperiod:0
  }, function(items) {
      chrome.extension.sendMessage({
                              action: 'refreshicon',
@@ -154,14 +155,18 @@
              return;
          }
          if (matched()) {
+	     var duties = [];
+	     if(items.dayperiod>0) {
+	       duties.push({
+	         dutyDate:ghdate,
+		 dutyCode:items.dayperiod
+	       });
+	     } else {
+	        duties.push({dutyDate:ghdate, dutyCode:1});
+	        duties.push({dutyDate:ghdate, dutyCode:2});
+	     } 
              console.log('开启定时挂号模式');
-             doCheckin([{
-                 dutyDate: ghdate,
-                 dutyCode: 1
-             }, {
-                 dutyDate: ghdate,
-                 dutyCode: 2
-             }]);
+             doCheckin(duties);
          } else {
              console.log('开启实时挂号模式');
              var elems = $('.ksorder_kyy');
@@ -173,7 +178,9 @@
                      dutyCode: $(e).parent().index()
                  };
              });
-
+	     if(items.dayperiod>0){
+	         elems = _.filter(elems, function(e){ return e.dutyCode == items.dayperiod; }); 
+	     }
              doCheckin(elems, fakeips[0]);
          }
          // fakeips = fakeips.slice(1);

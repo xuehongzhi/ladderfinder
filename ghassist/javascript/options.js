@@ -15,6 +15,7 @@ function save_options() {
     var pass = $('#password').val();
     var keywords = $('#keywords').val();
     var weekdays =  _.reduce($('#weekday input[type="checkbox"]:checked'), function(memo, e) {return memo.concat(parseInt($(e).val()))}, []);
+    var dayperiod = $('#dayperiod').val();
    
     console.log(weekdays);
     chrome.storage.sync.set({
@@ -26,6 +27,7 @@ function save_options() {
 	patient:$('#patient').val(),
 	cardno:$('#cardno').val(),
 	weekdays: weekdays.join(','),
+	dayperiod:parseInt(dayperiod)
     }, function() {
 
     });
@@ -42,7 +44,8 @@ function restore_options() {
         doctor:'',
         doctitle:'',
         patient:'',
-        cardno:''
+        cardno:'',
+        dayperiod:0,
     }, function(items) {
         $('#cellphone').val(items.phonenumber);
         $('#password').val(items.password);
@@ -51,6 +54,7 @@ function restore_options() {
         $('#keywords').importTags(items.keywords);
         $('#doctitle').importTags(items.doctitle);
         $('#cardno').val(items.cardno);
+        $('#dayperiod').val(items.dayperiod);
     });
 }
 $(function() {
