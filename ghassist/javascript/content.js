@@ -6,12 +6,13 @@
      doctitle: '',
      ghenable: false,
      ghinterval: 7,
-     dayperiod:0
+     dayperiod: 0,
+     weekdays: '0,1,2,3,4,5,6'
  }, function(items) {
      chrome.extension.sendMessage({
-                             action: 'refreshicon',
-                           enable:items.ghenable 
-                         });
+         action: 'refreshicon',
+         enable: items.ghenable
+     });
 
      var curdate = Date.now();
      var ghdate = new Date(curdate.valueOf() + items.ghinterval * 24 * 3600 * 1000);
@@ -156,32 +157,47 @@
              return;
          }
          if (matched()) {
-	     var duties = [];
-	     if(items.dayperiod>0) {
-	       duties.push({
-	         dutyDate:ghdate,
-		 dutyCode:items.dayperiod
-	       });
-	     } else {
-	        duties.push({dutyDate:ghdate, dutyCode:1});
-	        duties.push({dutyDate:ghdate, dutyCode:2});
-	     } 
+             var duties = [];
+             if (items.dayperiod > 0) {
+                 duties.push({
+                     dutyDate: ghdate,
+                     dutyCode: items.dayperiod
+                 });
+             } else {
+                 duties.push({
+                     dutyDate: ghdate,
+                     dutyCode: 1
+                 });
+                 duties.push({
+                     dutyDate: ghdate,
+                     dutyCode: 2
+                 });
+             }
              console.log('开启定时挂号模式');
              doCheckin(duties);
          } else {
              console.log('开启实时挂号模式');
              var elems = $('.ksorder_kyy');
-             elems = _.map(elems, function(e) {
-                 var ddate = $(e).children('input').val().split('_');
-                 ddate = ddate[ddate.length - 1];
-                 return {
-                     dutyDate: ddate,
-                     dutyCode: $(e).parent().index()
-                 };
-             });
-	     if(items.dayperiod>0){
-	         elems = _.filter(elems, function(e){ return e.dutyCode == items.dayperiod; }); 
-	     }
+             var tmspan = new Date($('th[scope="col"]:first p').text()).getDay();
+             elems = _.reduce(elems, function(memo, e) {
+                 var idx = $(e).index() + tmspan;
+                 idx = idx % 7;
+                 if (items.weekdays.indexOf(idx) >= 0) {
+                     var ddate = $(e).children('input').val().split('_');
+                     ddate = ddate[ddate.length - 1];
+                     return memo.concat({
+                         dutyDate: ddate,
+                         dutyCode: $(e).parent().index()
+                     });
+                 } else {
+                     return memo;
+                 }
+             }, []);
+             if (items.dayperiod > 0) {
+                 elems = _.filter(elems, function(e) {
+                     return e.dutyCode == items.dayperiod;
+                 });
+             }
              doCheckin(elems, fakeips[0]);
          }
          // fakeips = fakeips.slice(1);

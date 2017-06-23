@@ -48,6 +48,7 @@ function restore_options() {
         cardno:'',
         ghinterval:7,
         dayperiod:0,
+        weekdays:'0,1,2,3,4,5,6'
     }, function(items) {
         $('#cellphone').val(items.phonenumber);
         $('#password').val(items.password);
@@ -58,6 +59,11 @@ function restore_options() {
         $('#cardno').val(items.cardno);
         $('#ghinterval').val(items.ghinterval);
         $('#dayperiod').val(items.dayperiod);
+	$('#weekday input[type="checkbox"]').each(function(index, e){
+	     if (items.weekdays.indexOf($(e).val())>=0) {
+	          $(e).prop('checked',true);     
+	     }
+	});
     });
 }
 $(function() {
