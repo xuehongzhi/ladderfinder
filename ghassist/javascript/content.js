@@ -135,10 +135,12 @@
                          }) >= 0;
                      });
                      if (key && !find) {
-                         chrome.extension.sendMessage({
-                             action: 'newtab',
-                             url: getUrl(a[key][0])
-                         });
+			 var addr = $('<a href="'+getUrl(a[key][0])+'" target="_newtab" class="ksorder_dr1_syhy"></a>').appendTo('.ksorder_cen_l_table');
+			 $('<span>').appendTo(addr).click();
+                         //chrome.extension.sendMessage({
+                         //    action: 'newtab',
+                         //    url: getUrl(a[key][0])
+                         //});
                          find = true;
                      } else {
                          doCheckin(timelist.slice(1));
