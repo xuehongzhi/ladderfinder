@@ -85,11 +85,11 @@
              var ipseg = fakeips[0].split('.');
              ipseg[3]++;
              fakeips[0] = ipseg.join('.');
-             $.ajaxSetup({
-                 headers: {
-                     'x-forwarded-for': ip
-                 }
-             });
+             //$.ajaxSetup({
+             //    headers: {
+             //        'x-forwarded-for': ip
+             //    }
+             //});
          }
          $.ajax({
              type: "POST",
@@ -107,7 +107,7 @@
              },
              success: function(a) {
                  var getUrl = function(item) {
-                     return 'http://www.bjguahao.gov.cn/order/confirm/' + item.hospitalId + '-' + item.departmentId + '-' + item.doctorId + '-' + item.dutySourceId + '.htm';
+                     return '/order/confirm/' + item.hospitalId + '-' + item.departmentId + '-' + item.doctorId + '-' + item.dutySourceId + '.htm';
                  }
 
                  if (a.hasError && a.code == 2009) {
