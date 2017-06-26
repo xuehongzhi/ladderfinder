@@ -53,7 +53,7 @@
      var ghspan = 500;
 
      var find = false;
-
+     var logined = false;
      var matched = function() {
          curdate = new Date(Date.now());
          var d1 = new Date(curdate.getFullYear(), curdate.getMonth(), curdate.getDate(), chcktime[0], chcktime[1]);
@@ -69,11 +69,45 @@
 
      }
 
-     var simulateLogin = function() {
-         var f = $('#rg_nrfrom1')[0];
-         f.smsQuick.value = items.phonenumber;
-         $('#pwQuickLogin').val(items.password);
-         $('#rg_nrfrom1 #quick_login').trigger('click');
+     if ($('.grdbnav_context_right').children('a[href$="logout.htm"]').length > 0) {
+         logined = true;
+     }
+
+
+     var simulateLogin = function(timelist) {
+
+         var password1 = items.password;
+         var yzm1 = $("#yzmQuickLogin").val();
+         $.ajax({
+             type: "post",
+             url: "/quicklogin.htm",
+             data: {
+                 mobileNo: items.phonenumber,
+                 password: password1,
+                 yzm: yzm1,
+                 isAjax: true
+             },
+             dataType: "json",
+             success: function(response) {
+                 if (!response.hasError) {
+                     $.ajax({
+                         type: "post",
+                         url: "/islogin.htm",
+                         dataType: "json",
+                         data: {
+                             isAjax: true
+                         },
+                         success: function(a) {
+                             if (a.code * 1 == 200) {
+                                 logined = true;
+                                 doCheckin(timelist);
+                             }
+                         }
+                     });
+                 }
+             }
+         });
+
      }
 
      var doCheckin = function(timelist, ip) {
@@ -111,8 +145,11 @@
                  }
 
                  if (a.hasError && a.code == 2009) {
-                     simulateLogin();
-                     doCheckin(timelist);
+                     if (!logined) {
+                         simulateLogin(timelist);
+                     } else {
+                         doCheckin(timelist);
+                     }
                  } else if (!a.hasError) {
                      a = a.data;
                      a = _.groupBy(_.filter(a, function(e) {
@@ -135,8 +172,8 @@
                          }) >= 0;
                      });
                      if (key && !find) {
-			 var addr = $('<a href="'+getUrl(a[key][0])+'" target="_newtab" class="ksorder_dr1_syhy"></a>').appendTo('.ksorder_cen_l_table');
-			 $('<span>').appendTo(addr).click();
+                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab" class="ksorder_dr1_syhy"></a>').appendTo('.ksorder_cen_l_table');
+                         $('<span>').appendTo(addr).click();
                          //chrome.extension.sendMessage({
                          //    action: 'newtab',
                          //    url: getUrl(a[key][0])

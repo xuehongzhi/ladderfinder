@@ -49,7 +49,8 @@ $(function() {
                         obj.attr("disabled", false);
                     }
                 });
-            }).trigger('click');
+            })
+    //.trigger('click');
 
         var gher = $(".Rese_db_dl p:contains('" + items.patient + "') input");
 	gher.attr('checked', 'checked');
