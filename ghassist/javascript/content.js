@@ -172,8 +172,10 @@
                          }) >= 0;
                      });
                      if (key && !find) {
-                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab" class="ksorder_dr1_syhy"></a>').appendTo('.ksorder_cen_l_table');
-                         $('<span>').appendTo(addr).click();
+                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab"></a>').appendTo('.ksorder_djgh_dr1');
+                         $('<span>').appendTo(addr).on('click', function(){
+			    return true;
+			 }).trigger('click');
                          //chrome.extension.sendMessage({
                          //    action: 'newtab',
                          //    url: getUrl(a[key][0])
@@ -182,9 +184,6 @@
                      } else {
                          doCheckin(timelist.slice(1));
                      }
-                 }
-                 if (a.hasError) {
-                     doCheckin(timelist.slice(1));
                  }
              }
          });
