@@ -172,10 +172,17 @@
                          }) >= 0;
                      });
                      if (key && !find) {
-                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab"></a>').appendTo('.ksorder_djgh_dr1');
-                         $('<span>').appendTo(addr).on('click', function(){
+                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab"></a>').appendTo('.ksorder_djgh_dr1').on('click', function(){
+			   return true;
+			 });
+                         var sp = $('<span>').appendTo(addr).on('click', function(){
 			    return true;
-			 }).trigger('click');
+			 });
+			 setTimeout(function(){
+			    sp.trigger('click');
+			 }, 500);
+			 
+			 
                          //chrome.extension.sendMessage({
                          //    action: 'newtab',
                          //    url: getUrl(a[key][0])
