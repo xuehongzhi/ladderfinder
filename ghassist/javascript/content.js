@@ -7,6 +7,7 @@
      ghenable: false,
      ghinterval: 7,
      dayperiod: 0,
+     ghspan: 500,
      weekdays: '0,1,2,3,4,5,6'
  }, function(items) {
      chrome.extension.sendMessage({
@@ -50,7 +51,7 @@
      console.log(chcktime);
      var timerid = null;
      var refreshspan = 10000;
-     var ghspan = 500;
+     var ghspan = items.ghspan;
 
      var find = false;
      var logined = false;
@@ -172,23 +173,24 @@
                          }) >= 0;
                      });
                      if (key && !find) {
-                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab"></a>').appendTo('.ksorder_djgh_dr1').on('click', function(){
-			   return true;
-			 });
-                         var sp = $('<span>').appendTo(addr).on('click', function(){
-			    return true;
-			 });
-			 setTimeout(function(){
-			    sp.trigger('click');
-			 }, 500);
-			 
-			 
+                         var addr = $('<a href="' + getUrl(a[key][0]) + '" target="_newtab"></a>').appendTo('.ksorder_djgh_dr1').on('click', function() {
+                             return true;
+                         });
+                         var sp = $('<span>').appendTo(addr).on('click', function() {
+                             return true;
+                         });
+                         setTimeout(function() {
+                             sp.trigger('click');
+                         }, 1000);
+
+
                          //chrome.extension.sendMessage({
                          //    action: 'newtab',
                          //    url: getUrl(a[key][0])
                          //});
                          find = true;
                      } else {
+                         find = false;
                          doCheckin(timelist.slice(1));
                      }
                  }

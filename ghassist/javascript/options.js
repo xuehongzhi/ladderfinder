@@ -14,21 +14,24 @@ function save_options() {
     var phone = $('#cellphone').val();
     var pass = $('#password').val();
     var keywords = $('#keywords').val();
-    var weekdays =  _.reduce($('#weekday input[type="checkbox"]:checked'), function(memo, e) {return memo.concat(parseInt($(e).val()))}, []);
+    var weekdays = _.reduce($('#weekday input[type="checkbox"]:checked'), function(memo, e) {
+        return memo.concat(parseInt($(e).val()))
+    }, []);
     var dayperiod = $('#dayperiod').val();
-   
+    var ghspan = $('#ghspan').val();
     console.log(weekdays);
     chrome.storage.sync.set({
         phonenumber: phone,
         password: pass,
         keywords: keywords,
-	doctor:$('#doctor').val(),
-	doctitle:$('#doctitle').val(),
-	patient:$('#patient').val(),
-	cardno:$('#cardno').val(),
-	ghinterval:$('#ghinterval').val(),
-	weekdays: weekdays.join(','),
-	dayperiod:parseInt(dayperiod)
+        doctor: $('#doctor').val(),
+        doctitle: $('#doctitle').val(),
+        patient: $('#patient').val(),
+        cardno: $('#cardno').val(),
+        ghinterval: $('#ghinterval').val(),
+        weekdays: weekdays.join(','),
+        ghspan: parseInt(ghspan),
+        dayperiod: parseInt(dayperiod),
     }, function() {
 
     });
@@ -42,13 +45,14 @@ function restore_options() {
         phonenumber: '110',
         password: '',
         keywords: '',
-        doctor:'',
-        doctitle:'',
-        patient:'',
-        cardno:'',
-        ghinterval:7,
-        dayperiod:0,
-        weekdays:'0,1,2,3,4,5,6'
+        doctor: '',
+        doctitle: '',
+        patient: '',
+        cardno: '',
+        ghinterval: 7,
+        dayperiod: 0,
+        ghspan: 500,
+        weekdays: '0,1,2,3,4,5,6',
     }, function(items) {
         $('#cellphone').val(items.phonenumber);
         $('#password').val(items.password);
@@ -59,31 +63,34 @@ function restore_options() {
         $('#cardno').val(items.cardno);
         $('#ghinterval').val(items.ghinterval);
         $('#dayperiod').val(items.dayperiod);
-	$('#weekday input[type="checkbox"]').each(function(index, e){
-	     if (items.weekdays.indexOf($(e).val())>=0) {
-	          $(e).prop('checked',true);     
-	     }
-	});
+        $('#ghspan').val(items.ghspan);
+        $('#weekday input[type="checkbox"]').each(function(index, e) {
+            if (items.weekdays.indexOf($(e).val()) >= 0) {
+                $(e).prop('checked', true);
+            }
+        });
     });
 }
 $(function() {
-    $('#keywords').tagsInput({'width':$('#keywords').width(),
+    $('#keywords').tagsInput({
+        'width': $('#keywords').width(),
     });
-    $('#doctitle').tagsInput({'width':$('#doctitle').width(),
+    $('#doctitle').tagsInput({
+        'width': $('#doctitle').width(),
     })
     restore_options();
     $('#save').click(function(e) {
         save_options();
     });
-    $('#dayall').click(function(){
-	    var txt = $(this).val();
-	    var checked = !(txt=="反选");
-	    $('#weekday input[type="checkbox"]').prop('checked', checked);
-	    if(!checked) {
-	        $(this).val('全选');
-	    } else {
-		$(this).val('反选');
-	    }
+    $('#dayall').click(function() {
+        var txt = $(this).val();
+        var checked = !(txt == "反选");
+        $('#weekday input[type="checkbox"]').prop('checked', checked);
+        if (!checked) {
+            $(this).val('全选');
+        } else {
+            $(this).val('反选');
+        }
     });
 
 });
