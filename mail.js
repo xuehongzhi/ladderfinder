@@ -10,55 +10,56 @@ var ini = require('ini');
 
 var cheerio = require('cheerio');
 var curdate = Date.now();
-var ghdate = new Date(curdate.valueOf() - 3600 * 1000 * 1000);
-ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.getDate();
-console.log(ghdate);;
-var countries = ['japan', 'korea', 'tailand'];
 http.maxRedirects = 3;
 var connected = 0;
 var config = ini.parse(fs.readFileSync('./config.ini').toString());
-
-var confpath= config.openvpn.confpath;
+var dayinterval = parseInt(config.mailbox.dayinterval)
+var ghdate = new Date(curdate.valueOf() - dayinterval * 24 * 3600 * 1000);
+ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.getDate();
+console.log(ghdate);
+var countries = config.vpngate.countries.split(',');
+console.log(countries)
+var confpath = config.openvpn.confpath;
 var logpath = config.openvpn.logpath;
-var bindip = config.openvpn.bindip;
-var addlog=config.openvpn.addlog;
+var bindip = config.openvpn.bindip.trim();
+var addlog = parseInt(config.openvpn.addlog);
 
-var createImap = function(){
+var createImap = function() {
 
-	var mailsettings = config.mailbox;
+    var mailsettings = config.mailbox;
 
-	return new Imap({
-		user:mailsettings.user+'@'+mailsettings.domain,
-	        password:mailsettings.password,
-	        host:mailsettings.host,
-	        port:parseInt(mailsettings.port),
-		tls: mailsettings.tls=='1'?true:false
-	});
+    return new Imap({
+        user: mailsettings.user + '@' + mailsettings.domain,
+        password: mailsettings.password,
+        host: mailsettings.host,
+        port: parseInt(mailsettings.port),
+        tls: mailsettings.tls == '1' ? true : false
+    });
 }
 
-var removeUnconnected= function(logpath, confpath) {
-	fs.readdir(logpath, function(err, files){
-	      if(err){
-		    return;
-	      }
-	      
-              files.forEach(function(elt, i, arr){
-	          fs.readFile(path.join(logpath, arr[i]), function(err, data){
-		      if(err) return;
-		      data = data.toString().toLowerCase();
-		      if(data.indexOf('initialization sequence completed')<0 && path.extname(arr[i]).indexOf('.log')>=0){
-			     var vfile = path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '')+'.ovpn');
-			     fs.exists(vfile, function(exists){
-				   if(exists){
-					console.log(vfile);
-				   	fs.unlink(vfile);
-				   }
-			     });
-			     
-		      }
-		      });
-	      });
-	});
+var removeUnconnected = function(logpath, confpath) {
+    fs.readdir(logpath, function(err, files) {
+        if (err) {
+            return;
+        }
+
+        files.forEach(function(elt, i, arr) {
+            fs.readFile(path.join(logpath, arr[i]), function(err, data) {
+                if (err) return;
+                data = data.toString().toLowerCase();
+                if (data.indexOf('initialization sequence completed') < 0 && path.extname(arr[i]).indexOf('.log') >= 0) {
+                    var vfile = path.join(confpath, path.basename(arr[i]).replace(path.extname(arr[i]), '') + '.ovpn');
+                    fs.exists(vfile, function(exists) {
+                        if (exists) {
+                            console.log(vfile);
+                            fs.unlink(vfile);
+                        }
+                    });
+
+                }
+            });
+        });
+    });
 }
 
 var imap = createImap();
@@ -73,11 +74,11 @@ var download = function(url, fpath) {
 
         res.on('end', function() {
             if (bindip) {
-                data = data.replace(/nobind/g, 'bind '+bindip);
+                data = data.replace(/nobind/g, 'local ' + bindip);
             }
-	    if (addlog){
-	        data = data + 'log' + logpath + '\n';
-	    }
+            if (addlog != 0) {
+                data = data + 'log ' + logpath + '\n';
+            }
             fs.writeFileSync(fpath, data);
         });
     });
@@ -87,8 +88,8 @@ var download = function(url, fpath) {
 var candownload = function(cells) {
     var country = cells.eq(0).text().toLowerCase();
     if (_.findIndex(countries, function(e) {
-        return country.indexOf(e) >= 0;
-    }) < 0) {
+            return country.indexOf(e) >= 0;
+        }) < 0) {
         return false;
     }
 
@@ -107,7 +108,7 @@ var candownload = function(cells) {
     }
 
     var stream = parseFloat(cells.eq(3).find('span').first().text());
-    if (stream < 10 || stream > 60) {
+    if (stream < 10 || stream > 100) {
         return false;
     }
 
@@ -157,7 +158,7 @@ function connect(url) {
                 var ip = cells.eq(1).find('span').first().text();
                 var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
                 console.log(downparam[0]);
-                download(downparam[0],  path.join(confpath, downparam[1]) );
+                download(downparam[0], path.join(confpath, downparam[1]));
             })
 
         });
@@ -257,7 +258,3 @@ imap.once('error', function(err) {
 
 removeUnconnected(logpath, confpath);
 imap.connect();
-
-
-//http://www.vpngate.net/cn/do_openvpn.aspx?fqdn=&ip=121.139.166.171&tcp=995&udp=1195&sid=1486601628264&hid=3318593
-//http://www.vpngate.net/cn/common/openvpn_download.aspx?sid=1486601628264&amp;udp=1&amp;host=121.139.166.171&amp;port=1195&amp;hid=3318593&amp;/vpngate_121.139.166.171_udp_1195.ovpn

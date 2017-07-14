@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" charset="utf-8" content="text/html;" />
+    <script src="../javascript/jquery.min.js"></script>
+    <script src="../javascript/underscore-min.js"></script>
+    <script src="../javascript/jquery.tagsinput.min.js"></script>
+    <script src="../javascript/options.js"></script>
+    <link href='../css/jquery.tagsinput.min.css' rel="stylesheet">
+    <title id="optionsTitle">挂号设置</title>
+</head>
+<style>
+    tr input[name^="day"] {
+        width: 60px;
+    }
+    tr input {
+        width: 300px;
+    }
+    div.tagsinput {
+        padding: 1px;
+    }
+</style>
+
+<body>
+    <table cellpadding="1">
+        <tbody>
+            <tr>
+                <td style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">手机号:</span>
+                </td>
+                <td style="word-break: break-all;">
+                    <input type="text" id="cellphone" name="email" value="">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">密码:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="password" id="password" name="hours" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医师:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="doctor" name="doctor" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医师职称:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="doctitle" name="doctitle" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">挂号人</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="patient" name="patient" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">医保卡</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="cardno" name="cardno" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">关键字:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="keywords" name="keywords" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">预约周期:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="ghinterval" name="ghinterval" value="" />
+                </td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span style="color: rgb(0, 176, 80);">挂号日:</span>
+                </td>
+                <td style="border:1px solid gray">
+                    <table style="width:90%" id="weekday">
+                        <tr>
+                            <td>
+                                周一
+                                <input type="checkbox" id="day1" name="day1" value="1" />
+                            </td>
+                            <td>
+                                周二
+                                <input type="checkbox" id="day2" name="day2" value="2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                周三
+                                <input type="checkbox" id="day3" name="day3" value="3" />
+                            </td>
+                            <td>
+                                周四
+                                <input type="checkbox" id="day4" name="day4" value="4" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                周五
+                                <input type="checkbox" id="day5" name="day5" value="5" />
+                            </td>
+                            <td>
+                                周六
+                                <input type="checkbox" id="day6" name="day6" value="6" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                周日
+                                <input type="checkbox" id="day7" name="day7" value="0" />
+                            </td>
+                            <td>
+                                <input type="button" id="dayall" name="dayall" value="反选" checked style="width:50%" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">时间段:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <select style="width:100%" type="text" id="dayperiod" name="daypreiod" value="">
+                        <option value=0></option>
+                        <option value=1>上午</option>
+                        <option value=2>下午</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    &nbsp;<span style="color: rgb(0, 176, 80);">挂号间隔:</span>
+                    <br/>
+                </td>
+                <td colspan="1" rowspan="1" style="word-break: break-all;">
+                    <input type="text" id="ghspan"  value=""  />
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" rowspan="1" align="right">
+                    <button id="save" name='save' i18n-content="extensionSettingsLoadUnpackedButton">保存 &nbsp;&nbsp;</button>
+                    <button id="cancel" i18n-content="extensionSettingsLoadUnpackedButton">取消 &nbsp;&nbsp;</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>
