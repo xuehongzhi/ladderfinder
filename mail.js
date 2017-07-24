@@ -12,6 +12,7 @@ var cheerio = require('cheerio');
 var curdate = Date.now();
 http.maxRedirects = 3;
 var connected = 0;
+var rasphone =ini.parse(fs.readFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk')).toString()); 
 var config = ini.parse(fs.readFileSync('./config.ini').toString());
 var dayinterval = parseInt(config.mailbox.dayinterval)
 var ghdate = new Date(curdate.valueOf() - dayinterval * 24 * 3600 * 1000);
@@ -25,9 +26,7 @@ var bindip = config.openvpn.bindip.trim();
 var addlog = parseInt(config.openvpn.addlog);
 
 var createImap = function() {
-
     var mailsettings = config.mailbox;
-
     return new Imap({
         user: mailsettings.user + '@' + mailsettings.domain,
         password: mailsettings.password,
@@ -88,8 +87,8 @@ var download = function(url, fpath) {
 var candownload = function(cells) {
     var country = cells.eq(0).text().toLowerCase();
     if (_.findIndex(countries, function(e) {
-            return country.indexOf(e) >= 0;
-        }) < 0) {
+        return country.indexOf(e) >= 0;
+    }) < 0) {
         return false;
     }
 
@@ -112,9 +111,6 @@ var candownload = function(cells) {
         return false;
     }
 
-    if (cells.eq(6).text().toLowerCase().indexOf('udp') < 0) {
-        return false;
-    }
     return true;
 }
 
@@ -137,6 +133,33 @@ var geturl = function(baseurl, relurl, ip) {
     return [baseurl + 'common/openvpn_download.aspx?' + param.join('&'), fname];
 }
 
+var getovpn = function(url, cells, ip) {
+    if (cells.eq(6).text().toLowerCase().indexOf('udp') < 0) {
+        return;
+    }
+    var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
+    console.log(downparam[0]);
+    download(downparam[0], path.join(confpath, downparam[1]));
+}
+
+function uuidv4() {
+  return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+var getl2tp = function( url, cells, ip) {
+	config.l2tp.Guid = uuidv4();
+	config.l2tp.PhoneNumber = ip;
+	var ras = {};
+	for(var conf in config.l2tp) {
+	      ras[conf] = config.l2tp[conf];
+	}
+	console.log(ras);
+	rasphone['l2tp'+config.l2tp.Guid] = ras;
+}
+
 function connect(url) {
     console.log(url);
     var req = http.get(url, function(res) {
@@ -156,9 +179,8 @@ function connect(url) {
                     return;
                 }
                 var ip = cells.eq(1).find('span').first().text();
-                var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
-                console.log(downparam[0]);
-                download(downparam[0], path.join(confpath, downparam[1]));
+               // getovpn(url, cells, ip);
+		getl2tp(url, cells, ip);
             })
 
         });
@@ -243,6 +265,7 @@ imap.once('ready', function() {
                     _.map(files, function(f) {
                         fs.unlink(f);
                     });
+		    fs.writeFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk'), ini.stringify(rasphone))
                 });
                 imap.end();
             });
