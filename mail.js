@@ -18,12 +18,18 @@ var dayinterval = parseInt(config.mailbox.dayinterval)
 var ghdate = new Date(curdate.valueOf() - dayinterval * 24 * 3600 * 1000);
 ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.getDate();
 console.log(ghdate);
-var countries = config.vpngate.countries.split(',');
-console.log(countries)
-var confpath = config.openvpn.confpath;
-var logpath = config.openvpn.logpath;
-var bindip = config.openvpn.bindip.trim();
-var addlog = parseInt(config.openvpn.addlog);
+var vpnconfig = {}
+
+_.each(config.vpngate.type.split(','), function(k){
+	vpnconfig[k] = function(vpntype) {
+	var ras = {};
+	for(var conf in config[vpntype]) {
+	      ras[conf] = config[vpntype][conf];
+	} 
+	return ras;
+	}(k);
+});
+
 
 var createImap = function() {
     var mailsettings = config.mailbox;
@@ -72,10 +78,10 @@ var download = function(url, fpath) {
         })
 
         res.on('end', function() {
-            if (bindip) {
+            if (vpnconfig.openvpn.bindip) {
                 data = data.replace(/nobind/g, 'local ' + bindip);
             }
-            if (addlog != 0) {
+            if (vpnconfig.openvpn.addlog != 0) {
                 data = data + 'log ' + logpath + '\n';
             }
             fs.writeFileSync(fpath, data);
@@ -84,9 +90,13 @@ var download = function(url, fpath) {
 }
 
 
-var candownload = function(cells) {
+var candownload = function(vpn, cells) {
+    var countries = [];
+    if(vpn.countries.length>0){
+      countries.concat(vpn.countries.split(','));
+    }
     var country = cells.eq(0).text().toLowerCase();
-    if (_.findIndex(countries, function(e) {
+    if (countries.length>0 && _.findIndex(countries, function(e) {
         return country.indexOf(e) >= 0;
     }) < 0) {
         return false;
@@ -133,13 +143,13 @@ var geturl = function(baseurl, relurl, ip) {
     return [baseurl + 'common/openvpn_download.aspx?' + param.join('&'), fname];
 }
 
-var getovpn = function(url, cells, ip) {
+var getopenvpn = function(url, cells, ip) {
     if (cells.eq(6).text().toLowerCase().indexOf('udp') < 0) {
         return;
     }
     var downparam = geturl(url, cells.eq(6).children('a').attr('href'), ip);
     console.log(downparam[0]);
-    download(downparam[0], path.join(confpath, downparam[1]));
+    download(downparam[0], path.join(config.openvpn.confpath, downparam[1]));
 }
 
 function uuidv4() {
@@ -150,11 +160,14 @@ function uuidv4() {
 }
 
 var getl2tp = function( url, cells, ip) {
-	config.l2tp.Guid = uuidv4();
-	config.l2tp.PhoneNumber = ip;
+	if (cells.eq(5).text().toLowerCase().trim() == 0) {
+        	return;
+    	}
+	config.l2tp.config.Guid = uuidv4();
+	config.l2tp.config.PhoneNumber = ip;
 	var ras = {};
-	for(var conf in config.l2tp) {
-	      ras[conf] = config.l2tp[conf];
+	for(var conf in config.l2tp.config) {
+	      ras[conf] = config.l2tp.config[conf];
 	}
 	console.log(ras);
 	rasphone['l2tp'+config.l2tp.Guid] = ras;
@@ -175,12 +188,13 @@ function connect(url) {
             });
             $('#vg_hosts_table_id').last().children('tr').has('.vg_table_row_1').each(function() {
                 var cells = $(this).children('td');
-                if (!candownload(cells)) {
-                    return;
-                }
                 var ip = cells.eq(1).find('span').first().text();
-               // getovpn(url, cells, ip);
-		getl2tp(url, cells, ip);
+		for(var conf in vpnconfig) {
+			if (!candownload(vpnconfig[conf], cells)) {
+			    return;
+			}
+			eval('get'+conf)(url, cells, ip);
+		}
             })
 
         });
@@ -264,7 +278,7 @@ imap.once('ready', function() {
                 lineReader.on('close', function() {
                     _.map(files, function(f) {
                         fs.unlink(f);
-                    });
+                    })
 		    fs.writeFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk'), ini.stringify(rasphone))
                 });
                 imap.end();
@@ -279,5 +293,5 @@ imap.once('error', function(err) {
     console.error(err);
 });
 
-removeUnconnected(logpath, confpath);
+removeUnconnected(vpnconfig.openvpn.logpath, vpnconfig.openvpn.confpath);
 imap.connect();
