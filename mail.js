@@ -12,7 +12,7 @@ var cheerio = require('cheerio');
 var curdate = Date.now();
 http.maxRedirects = 3;
 var connected = 0;
-var rasphone =ini.parse(fs.readFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk')).toString()); 
+var rasphone = ini.parse(fs.readFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk')).toString());
 var config = ini.parse(fs.readFileSync('./config.ini').toString());
 var dayinterval = parseInt(config.mailbox.dayinterval)
 var ghdate = new Date(curdate.valueOf() - dayinterval * 24 * 3600 * 1000);
@@ -20,14 +20,14 @@ ghdate = ghdate.getFullYear() + '-' + (ghdate.getMonth() + 1) + '-' + ghdate.get
 console.log(ghdate);
 var vpnconfig = {}
 
-_.each(config.vpngate.type.split(','), function(k){
-	vpnconfig[k] = function(vpntype) {
-	var ras = {};
-	for(var conf in config[vpntype]) {
-	      ras[conf] = config[vpntype][conf];
-	} 
-	return ras;
-	}(k);
+_.each(config.vpngate.type.split(','), function(k) {
+    vpnconfig[k] = function(vpntype) {
+        var ras = {};
+        for (var conf in config[vpntype]) {
+            ras[conf] = config[vpntype][conf];
+        }
+        return ras;
+    }(k);
 });
 
 
@@ -92,13 +92,13 @@ var download = function(url, fpath) {
 
 var candownload = function(vpn, cells) {
     var countries = [];
-    if(vpn.countries.length>0){
-      countries.concat(vpn.countries.split(','));
+    if (vpn.countries.length > 0) {
+        countries.concat(vpn.countries.split(','));
     }
     var country = cells.eq(0).text().toLowerCase();
-    if (countries.length>0 && _.findIndex(countries, function(e) {
-        return country.indexOf(e) >= 0;
-    }) < 0) {
+    if (countries.length > 0 && _.findIndex(countries, function(e) {
+            return country.indexOf(e) >= 0;
+        }) < 0) {
         return false;
     }
 
@@ -106,19 +106,29 @@ var candownload = function(vpn, cells) {
     if (days.indexOf('days') < 0) {
         return;
     }
-    days = parseInt(days);
-    if (days < 2 || days > 30) {
-        return false;
+
+    if (vpn.days.trim().length <= 0) {
+        dr = vpn.days.split(',');
+        days = parseInt(days);
+        if (days < dr[0] || days > dr[1]) {
+            return false;
+        }
     }
 
     var session = parseInt(cells.eq(2).find('span').first().text());
-    if (session < 1 || session > 50) {
-        return false;
+    if (vpn.session.trim().length <= 0) {
+        sr = vpn.session.split(',');
+        if (session < sr[0] || session > sr[1]) {
+            return false;
+        }
     }
 
     var stream = parseFloat(cells.eq(3).find('span').first().text());
-    if (stream < 10 || stream > 100) {
-        return false;
+    if (vpn.stream.trim().length <= 0) {
+        ssr = vpn.stream.split(',');
+        if (stream < ssr[0] || stream > ssr[1]) {
+            return false;
+        }
     }
 
     return true;
@@ -153,24 +163,26 @@ var getopenvpn = function(url, cells, ip) {
 }
 
 function uuidv4() {
-  return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
+    return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0,
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
 }
 
-var getl2tp = function( url, cells, ip) {
-	if (cells.eq(5).text().toLowerCase().trim() == 0) {
-        	return;
-    	}
-	config.l2tp.config.Guid = uuidv4();
-	config.l2tp.config.PhoneNumber = ip;
-	var ras = {};
-	for(var conf in config.l2tp.config) {
-	      ras[conf] = config.l2tp.config[conf];
-	}
-	console.log(ras);
-	rasphone['l2tp'+config.l2tp.Guid] = ras;
+var getl2tp = function(url, cells, ip) {
+    if (cells.eq(5).text().toLowerCase().trim() == 0) {
+        return;
+    }
+    config.l2tp.config.Guid = uuidv4();
+    config.l2tp.config.PhoneNumber = ip;
+    var ras = {};
+    for (var conf in config.l2tp.config) {
+        ras[conf] = config.l2tp.config[conf];
+    }
+    if(!rasphone.hasOwnProperty(ip)){
+	    rasphone[ip] = ras;
+    }
 }
 
 function connect(url) {
@@ -189,12 +201,12 @@ function connect(url) {
             $('#vg_hosts_table_id').last().children('tr').has('.vg_table_row_1').each(function() {
                 var cells = $(this).children('td');
                 var ip = cells.eq(1).find('span').first().text();
-		for(var conf in vpnconfig) {
-			if (!candownload(vpnconfig[conf], cells)) {
-			    return;
-			}
-			eval('get'+conf)(url, cells, ip);
-		}
+                for (var conf in vpnconfig) {
+                    if (!candownload(vpnconfig[conf], cells)) {
+                        return;
+                    }
+                    eval('get' + conf)(url, cells, ip);
+                }
             })
 
         });
@@ -208,6 +220,11 @@ function openInbox(cb) {
     imap.openBox('INBOX', true, cb);
 }
 
+setTimeout(function() {
+    console.log(rasphone);
+    fs.writeFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk'), ini.stringify(rasphone));
+    process.exit(0);
+}, 20000);
 
 imap.once('ready', function() {
     openInbox(function(err, box) {
@@ -278,8 +295,7 @@ imap.once('ready', function() {
                 lineReader.on('close', function() {
                     _.map(files, function(f) {
                         fs.unlink(f);
-                    })
-		    fs.writeFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk'), ini.stringify(rasphone))
+                    });
                 });
                 imap.end();
             });
@@ -293,5 +309,5 @@ imap.once('error', function(err) {
     console.error(err);
 });
 
-removeUnconnected(vpnconfig.openvpn.logpath, vpnconfig.openvpn.confpath);
+removeUnconnected(config.openvpn.logpath, config.openvpn.confpath);
 imap.connect();
