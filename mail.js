@@ -86,6 +86,8 @@ var download = function(url, fpath) {
             }
             fs.writeFileSync(fpath, data);
         });
+    }).on('error', function(err) {
+        console.error(url + ' download failed ' + err);
     });
 }
 
@@ -181,6 +183,7 @@ var getl2tp = function(url, cells, ip) {
         ras[conf] = config.l2tp.config[conf];
     }
     if(!rasphone.hasOwnProperty(ip)){
+	    console.log(ip);
 	    rasphone[ip] = ras;
     }
 }
@@ -221,7 +224,7 @@ function openInbox(cb) {
 }
 
 setTimeout(function() {
-    console.log(rasphone);
+    //console.log(rasphone);
     fs.writeFileSync(path.join(process.env.APPDATA, 'Microsoft/network/Connections/Pbk/rasphone.pbk'), ini.stringify(rasphone));
     process.exit(0);
 }, 20000);
